@@ -1,7 +1,17 @@
 # CHANGES — applied substitutions
 
-Mergify auto-queue is live: ready PRs to main require passing verify, Unfret and exact-head live-gate; workflow changes require operator queueing.
+In ericlitman/open-pstack, Mergify auto-queue is live: ready PRs to main require passing verify, Unfret and exact-head live-gate; workflow changes require operator queueing. In the letrandat fork, every mention in this file of `live-gate`, `verify-open-pstack`, Mergify, Unfret, or ericlitman issues records ericlitman's process. The fork uses the merge gate and smoke test in `AGENTS.md` instead.
 This port applies the Cursor → Claude Code substitutions in skill bodies. Earlier drafts left them flagged; this revision resolves them. A later pass added a Codex build that shares the same skills; see [Codex port](#codex-port) below.
+
+## 1.5.1-ld.1 syncs to Cursor pstack 0.15.9
+
+This fork tracks Cursor pstack 0.15.9 at `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a`, on ericlitman/open-pstack port base `1b03678171f6f400ae2cc9dc4e7a4a6a13e4bb43`. The shared catalog has 57 skills and 24 principles.
+
+Imported: `correct`, `benchmark-checklist`, `principle-explain-the-number`, fresh subagents for new work and retries, plain alternatives without reply tokens, an hourly `/loop 1h` audit tick, pushes after each verified unit, the final `git merge-tree` and changed-path recheck, built-in PR tool preference, `##` PR headings, schema-first casts, performance mantras, and Architect's agent-mistake red flags. Swarm respawns a worker after a missing proof, and Technical-writing takes upstream's source-line cuts. `README-UPSTREAM.md` stays verbatim at this sync point.
+
+The port keeps its AskUserQuestion and run/verify translations, provider dispatch, installed-plugin reads, standing-objective substitute for `/goal`, fork-aware PR and stack rules, draft evidence gates, captured-SHA leases, and expected-head merges. The hourly tick remains an observation cadence. Only affirmative failure evidence marks a lane stuck. Codex uses the existing recurring-task mapping at the same hourly cadence. `poteto-agent` keeps its Claude preload and omits Cursor's `is_background` field.
+
+`correct` remains user-only and has no poteto-mode route. The checklist stays model-invocable because three workflows call it by name. The new principle uses `user-invocable: false` without an invocation-blocking flag. The verifier registry covers all three additions through its existing invocation recipe. The port keeps its checker and changes only the cadence marker and matching tests. Static checks preserve the new invocation flags and the fork API fallback. The Cursor manifest and two changed guide pages remain excluded, as recorded in `UPSTREAM.md`.
 
 ## Unreleased
 
@@ -17,7 +27,7 @@ The shipped `pstack-runner` no longer loads the caller project's environment fil
 
 Setup resolves the active harness's config home through `poteto-mode/references/codex-tools.md`: nonempty `CLAUDE_CONFIG_DIR` or `CODEX_HOME`, falling back to `$HOME/.claude` or `$HOME/.codex` for unset or empty values. The model sheet, global instruction integration, current-state reads, snapshots, restoration, and readback all use that directory. Claude keeps the literal `@~/.claude/pstack-models.md` import at the default home and renders exactly `@./pstack-models.md` for a redirected home, keeping spaces and `#` in the config-directory name out of the import line. It identifies the existing import by the target basename `pstack-models.md`, replaces one matching line in place, appends when none exist, and stops before writing if more than one exists. Codex retains its exact-byte bounded block. Default-home behavior, role defaults, probes, and confirmation are unchanged.
 
-This is an intentional Claude Code/Codex port divergence from Cursor's `~/.cursor/rules/` destination, recorded in `UPSTREAM.md` for the port-patch ledger (#105). The named config-home invariant in `tests/skill-collision-repro.sh` rejects literal default-home destinations outside the legacy import, requires the literal default-home rendering and zero/one/many import rules, and checks unset, empty, and space-containing resolution without writing daily files. `tests/setup-config-home-repro.sh` prepares private redirected directories while preserving real `HOME` and `USER`, and checks artifacts and unchanged daily targets; it does not substitute for installed-harness invocation, receipts, or fresh-session loading proof. The operator supplies that evidence on the final PR head and posts the live gate.
+This is an intentional Claude Code/Codex port divergence from Cursor's `~/.cursor/rules/` destination, recorded in `UPSTREAM.md` for the port-patch ledger (#105). The named config-home invariant in `tests/skill-collision-repro.sh` rejects literal default-home destinations outside the legacy import, requires the literal default-home rendering and zero/one/many import rules, and checks unset, empty, and space-containing resolution without writing daily files. `tests/setup-config-home-repro.sh` prepares private redirected directories while preserving real `HOME` and `USER`, and checks artifacts and unchanged daily targets; it does not substitute for installed-harness invocation, receipts, or fresh-session loading proof. In ericlitman/open-pstack, the operator supplies that evidence on the final PR head and posts the live gate; the letrandat fork uses the `AGENTS.md` smoke test.
 
 ## 1.5.0 syncs to Cursor pstack 0.15.5
 

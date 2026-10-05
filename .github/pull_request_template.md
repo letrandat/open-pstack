@@ -1,13 +1,12 @@
 Closes #
 
-## What changed
+## Why
 
 
 ## Verification
 
-- [ ] Bun tests, strict typecheck, static invariants, and plugin validation pass.
-- [ ] The exact candidate is installed in every affected harness.
-- [ ] The changed behavior passes from each real user surface.
-- [ ] The `live-gate` status on the final head links the evidence comment (installed version, surface, action, observed result).
+- [ ] CI `verify` passes on the head.
+- [ ] A reviewer on a different model from the writer approved the diff.
+- [ ] The smoke test from `AGENTS.md` passes on the exact head. The head SHA, commands, and observed output are below.
 
-Mergify does not queue a pull request without `live-gate` on its exact head. Do not merge, tag, release, or roll out without it.
+Tag `v<version>` on the merged commit after the merge, per `AGENTS.md`.

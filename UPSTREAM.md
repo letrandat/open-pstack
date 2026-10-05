@@ -8,11 +8,12 @@ open-pstack tracks [Cursor's pstack](https://github.com/cursor/plugins/tree/main
 | --- | --- |
 | Repository | `https://github.com/cursor/plugins.git` |
 | Path | `pstack/` |
-| Commit | `12d587dfb20741cafc376c42c696c5f6e2a64487` |
-| Upstream version | `0.15.5` |
-| open-pstack version | `1.5.0` |
+| Commit | `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` |
+| Upstream version | `0.15.9` |
+| open-pstack version | `1.5.1-ld.1` |
+| Port base | `1b03678171f6f400ae2cc9dc4e7a4a6a13e4bb43` |
 
-The table above is the current Cursor sync point. Open Pstack 1.5.0 imports this 0.15.5 sync. `README-UPSTREAM.md` preserves the upstream pstack README verbatim. `CHANGES.md` and `NOTICE.md` describe the adaptations and provenance.
+The table above is the current Cursor sync point. This fork's Open Pstack 1.5.1-ld.1 imports Cursor pstack 0.15.9. `Port base` records the ericlitman/open-pstack commit this fork last landed. Cursor content and the port base advance independently. `README-UPSTREAM.md` preserves the upstream pstack README verbatim. `CHANGES.md` and `NOTICE.md` describe the adaptations and provenance.
 
 ## Upstream-only exclusions
 
@@ -24,6 +25,8 @@ The table above is the current Cursor sync point. Open Pstack 1.5.0 imports this
 - The expected-runtime column in `70b2dc8`'s `children.tsv` and its expected-runtime stuck test are not applied. A lane is stuck only on affirmative failure evidence.
 - The explicit Grok, Opus, and Sol defaults for the Why and Reflect roles are not applied. Those roles stay on `inherit-parent` because the external runner omits the parent's MCP servers.
 - The Claude manifest does not take the logo field from `efa2a53` because Claude Code has no schema for it. The shared asset is exposed through the Codex manifest instead.
+- Two `disable-model-invocation: true` lines from `23e4138` are not applied to `benchmark-checklist` or `principle-explain-the-number`. Poteto-mode, Perf issue, and Hillclimb invoke the checklist by name, and the flag blocks that route on Claude Code. The principle uses `user-invocable: false`, like the other model-readable leaves. `correct` keeps its user-only flag from `9511e60`.
+- This sync does not import `pstack/.cursor-plugin/plugin.json`. The port has separate Claude Code and Codex manifests with its own version. It also leaves `pstack/docs/guide/08-principles.md` and `pstack/docs/guide/README.md` upstream because the guide teaches Cursor UI, sticky mode, and cloud agents. The shared principle index and port reference carry the new leaf instead.
 
 ## Local port-patch ledger
 
@@ -41,19 +44,19 @@ Fetch and inspect only commits that touched pstack after the recorded sync point
 
 ```shell
 git fetch cursor main
-git log --oneline 12d587dfb20741cafc376c42c696c5f6e2a64487..cursor/main -- pstack
-git diff --stat 12d587dfb20741cafc376c42c696c5f6e2a64487..cursor/main -- pstack
+git log --oneline e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a..cursor/main -- pstack
+git diff --stat e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a..cursor/main -- pstack
 ```
 
 No output means the tracked pstack tree has not changed. This comparison does not need a polling service or generated mirror branch.
 
 ## Incorporate a change
 
-1. Create or update a GitHub issue in `ericlitman/open-pstack` and branch from current `main`.
+1. In the letrandat fork, track the sync in a `letrandat/open-pstack` issue and branch as the `AGENTS.md` Sync section says. (In ericlitman/open-pstack, the step is an issue there and a branch from current `main`.)
 2. Read each upstream pstack commit in order. Bring over its intent and content, then apply only the Claude Code and Codex substitutions documented in `CHANGES.md`.
 3. Keep one shared `plugins/pstack/skills/` tree. Put harness translation in the existing `codex-tools.md` and provider routing in `provider-dispatch.md`; do not fork a skill per harness.
 4. Update the commit and version in this file, the affected provenance rows in `NOTICE.md`, and `README-UPSTREAM.md` when upstream changes it.
-5. Run CI-equivalent checks locally, then run the installed Claude Code and Codex behavioral lanes required by the changed surface. Unit tests alone are not a release gate.
+5. Run CI-equivalent checks locally, then run the installed Claude Code and Codex behavioral lanes required by the changed surface. Unit tests alone are not a release gate. In the letrandat fork, the `AGENTS.md` merge gate and smoke test replace these lanes.
 6. Merge the reviewed PR before tagging the next open-pstack release.
 
 Cursor's version and open-pstack's version are independent. Cursor's version identifies the imported content; open-pstack's version identifies the cross-harness distribution.

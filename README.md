@@ -1,5 +1,7 @@
 # open-pstack
 
+> **letrandat fork.** This fork of [ericlitman/open-pstack](https://github.com/ericlitman/open-pstack) lands Cursor pstack syncs ahead of upstream. Install it with `/plugin marketplace add letrandat/open-pstack`. The rest of this README is upstream's; `AGENTS.md` describes how the fork syncs and releases.
+
 [![CI](https://github.com/ericlitman/open-pstack/actions/workflows/ci.yml/badge.svg)](https://github.com/ericlitman/open-pstack/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/ericlitman/open-pstack)](https://github.com/ericlitman/open-pstack/releases/latest)
 [![MIT license](https://img.shields.io/github/license/ericlitman/open-pstack)](LICENSE)
@@ -119,6 +121,10 @@ That is the main workflow. The other skills are there when poteto-mode needs the
 | `maintain-verification-skill` | The project's verification instructions no longer match the product. |
 | `babysit` | A pull request needs CI failures and review comments handled until it is ready. |
 | `reflect` | A hard task is finished and its lessons should improve the next run. |
+| `correct` | Agents keep making the same mistake and the repository should prevent it. |
+| `benchmark-checklist` | You measured a performance number and need to check what it means. |
+
+Poteto-mode lists all 24 principle skills. [Explain the number](plugins/pstack/skills/principle-explain-the-number/SKILL.md) checks what limits a measured result and whether the run did the intended work.
 
 Plugin skills include `pstack:` in their name. In Claude Code, invoke a native skill such as `/pstack:architect`. In Codex, ask for the skill, such as `Use pstack:architect for this design.` See the [technical reference](docs/reference.md) for the full list.
 
@@ -155,7 +161,7 @@ This repository also keeps:
 
 ## Staying close to Lauren's pstack
 
-Open Pstack 1.5.0 tracks pstack 0.15.5 at Cursor commit [`12d587dfb20741cafc376c42c696c5f6e2a64487`](https://github.com/cursor/plugins/commit/12d587dfb20741cafc376c42c696c5f6e2a64487).
+Open Pstack 1.5.1-ld.1 tracks pstack 0.15.9 at Cursor commit [`e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a`](https://github.com/cursor/plugins/commit/e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a).
 
 The two projects have separate version numbers. The pstack version identifies Lauren's upstream content. The Open Pstack version identifies the Claude Code and Codex package built from it.
 
