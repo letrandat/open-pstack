@@ -1,5 +1,7 @@
 # open-pstack
 
+> **letrandat fork.** This fork of [ericlitman/open-pstack](https://github.com/ericlitman/open-pstack) lands Cursor pstack syncs ahead of upstream. Install it with `/plugin marketplace add letrandat/open-pstack`. The rest of this README is upstream's; `AGENTS.md` describes how the fork syncs and releases.
+
 [![CI](https://github.com/ericlitman/open-pstack/actions/workflows/ci.yml/badge.svg)](https://github.com/ericlitman/open-pstack/actions/workflows/ci.yml)
 [![Latest release](https://img.shields.io/github/v/release/ericlitman/open-pstack)](https://github.com/ericlitman/open-pstack/releases/latest)
 [![MIT license](https://img.shields.io/github/license/ericlitman/open-pstack)](LICENSE)
