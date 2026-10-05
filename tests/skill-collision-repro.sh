@@ -341,7 +341,7 @@ grep -Fq 'never infer stack order from their equal base branches' "$autopilot_st
 grep -Fq 'git rebase --onto "$parent_tip" "$current_base_sha" -- "$branch"' "$autopilot_stack" || shipping_safety_bad="${shipping_safety_bad}Autopilot-stack does not move only child commits when a parent tip changes"$'\n'
 grep -Fq "Shipping step 4's disarm-and-confirm rule to that child and every descendant" "$opening_a_pr" || shipping_safety_bad="${shipping_safety_bad}Opening a PR can rewrite or retarget an armed existing stack"$'\n'
 grep -Fq 'If repository instructions require a draft until named evidence exists' "$opening_a_pr" || shipping_safety_bad="${shipping_safety_bad}Opening a PR ignores repository-required draft evidence gates"$'\n'
-grep -Fq 'Create every fork PR' "$opening_a_pr" || shipping_safety_bad="${shipping_safety_bad}Opening a PR does not bind a root fork PR to its explicit head repository"$'\n'
+grep -Fq 'use the resolved Origin command for every fork PR' "$opening_a_pr" || shipping_safety_bad="${shipping_safety_bad}Opening a PR does not bind a root fork PR to its explicit head repository"$'\n'
 grep -Fq 'A fork child PR targets trunk while retaining local parent ancestry' "$multi_phase_plan" || shipping_safety_bad="${shipping_safety_bad}Multi-phase plan does not model fork stack PR bases"$'\n'
 for fork_file in "$autopilot_stack" "$opening_a_pr" "$multi_phase_plan"; do
   grep -Fq 'gh api --method POST "repos/$base_repo/pulls"' "$fork_file" || shipping_safety_bad="${shipping_safety_bad}${fork_file} does not create fork PRs through the organization-capable GitHub API"$'\n'
@@ -384,7 +384,7 @@ else
   note "ok: excluded upstream skills stay absent"
 fi
 
-routed_model_skills=(how why unslop typescript-best-practices)
+routed_model_skills=(how why unslop typescript-best-practices benchmark-checklist)
 routed_model_bad=""
 for name in "${routed_model_skills[@]}"; do
   routed_skill="$plugin/skills/$name/SKILL.md"
@@ -399,6 +399,14 @@ if [ -n "$routed_model_bad" ]; then
   fail=1
 else
   note "ok: routed skills stay model-invocable"
+fi
+
+correct_front="$(sed -n '2,/^---$/p' "$plugin/skills/correct/SKILL.md")"
+if ! printf '%s\n' "$correct_front" | grep -q '^disable-model-invocation: true$' || grep -Eq 'pstack:correct|\*\*correct\*\*' "$plugin/skills/poteto-mode/SKILL.md"; then
+  note "FAIL: correct must remain user-only and outside poteto-mode routing"
+  fail=1
+else
+  note "ok: correct stays user-only and outside poteto-mode routing"
 fi
 
 sol_descriptor="$(awk -F '|' '

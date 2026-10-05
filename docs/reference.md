@@ -59,7 +59,7 @@ The marketplace install is the normal user path. Direct links are only for testi
 ├── plugins/pstack/                   # the plugin itself
 │   ├── .claude-plugin/plugin.json    # Claude Code manifest
 │   ├── .codex-plugin/plugin.json     # Codex manifest (skills: ./skills/)
-│   ├── skills/                       # 54 skills shared by Claude Code and Codex
+│   ├── skills/                       # 57 skills shared by Claude Code and Codex
 │   │   ├── poteto-mode/references/{codex-tools,provider-dispatch}.md  # tool + provider routing
 │   │   └── poteto-mode/scripts/      # bun/bash/node tooling: watch-pr, orch, runner, check-plan.mjs, worktree-audit.sh
 │   ├── hooks/                        # SessionStart auto-fire: injects the poteto-mode mandate (Claude Code only)
@@ -82,7 +82,7 @@ Plugin-internal `skills/<name>/` path references in the docs below are relative 
 The Codex build shares one `skills/` tree with the Claude Code build. Nothing is forked or generated. Two narrow references keep runtime translation separate: `codex-tools.md` maps harness primitives and `provider-dispatch.md` maps model providers. pstack otherwise keeps the upstream Claude-native prose and adds a one-line Platform note to each skill that names a Claude primitive, so the port stays in lockstep with upstream sync.
 
 - **Skill invocation.** Codex loads `SKILL.md` natively. There is no `Skill` tool. You invoke a skill by name (ask for it, or pick `pstack:poteto-mode` from the list).
-- **Package surface.** The native `skills/` tree is the only workflow source. The plugin ships no `commands/` layer and does not link prompts into `~/.codex/prompts/`. Codex would migrate such files into duplicate source-command skills while loading the native skill tree. The 23 `principle-*` leaves declare `user-invocable: false`. Claude keeps them out of its user picker; Codex 0.149.0 currently shows them despite that metadata ([#8](https://github.com/ericlitman/open-pstack/issues/8)).
+- **Package surface.** The native `skills/` tree is the only workflow source. The plugin ships no `commands/` layer and does not link prompts into `~/.codex/prompts/`. Codex would migrate such files into duplicate source-command skills while loading the native skill tree. The 24 `principle-*` leaves, including [explain-the-number](../plugins/pstack/skills/principle-explain-the-number/SKILL.md), declare `user-invocable: false`. Claude keeps them out of its user picker; Codex 0.149.0 currently shows them despite that metadata ([#8](https://github.com/ericlitman/open-pstack/issues/8)).
 - **Tool and built-in mapping.** Claude tool names and built-in skills resolve through [`codex-tools.md`](../plugins/pstack/skills/poteto-mode/references/codex-tools.md). Model execution resolves separately through [`provider-dispatch.md`](../plugins/pstack/skills/poteto-mode/references/provider-dispatch.md), so Codex can keep Sol native while invoking Claude and Grok externally.
 - **Subagents.** The `Agent` tool maps to Codex `spawn_agent` / `wait_agent`, enabled by `multi_agent = true`. Parallel fan-out is multiple `spawn_agent` calls in one turn. If the native Codex lane is unavailable, record that lane as a dropout; external Claude and Grok lanes still run, and no provider is silently substituted. There is no `poteto-agent` subagent type on Codex; route ad-hoc subagents by dispatching a `spawn_agent` told to read `poteto-mode` first.
 - **Auto-fire.** The `hooks/` SessionStart injection is Claude Code-only; Codex has no plugin hook runtime. Enter `pstack:poteto-mode` by name, or add a standing instruction to `~/.codex/AGENTS.md` if you want the same always-on routing.
@@ -128,6 +128,8 @@ The table uses the short upstream names. Claude Code exposes each native skill w
 | `/interrogate` | have several different models try to break a diff |
 | `/automate-me` | draft your own personal -mode skill from recent transcripts |
 | `/reflect` | capture a long task's lessons as a skill edit |
+| `/correct` | prevent repeated agent mistakes with architecture, types, lint, or tests, invoked by the user only |
+| `/benchmark-checklist` | check the limiter, tuning, errors, repeatability, and relevance of a measured performance number |
 | `/tdd` | fix a bug by writing the failing test first, then the fix |
 | `/typescript-best-practices` | ground type-system discipline in TypeScript syntax |
 | `/teach` | understand a change or subsystem for real: `how` + `why` woven into one plain explanation |
