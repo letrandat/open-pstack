@@ -30,6 +30,8 @@ These parts of the patch are easy to lose in a rebuild:
 - Every added skill needs an entry in `.claude/skills/verify-open-pstack/features/registry.json`. The CI static test fails on an unmapped skill.
 - Test and catalog updates that follow the skill text, such as `tests/skill-collision-repro.sh` and `docs/reference.md`.
 - Release metadata: the version in the four places `tests/skill-collision-repro.sh` checks, and the `Port base` row in `UPSTREAM.md`.
+- A `CHANGES.md` section headed with the new version. The static test runs `scripts/release.py notes`, which needs exactly one nonempty section for the manifest version.
+- A static assertion that a clean merge keeps but the newer text no longer satisfies, such as an old phrase in `tests/skill-collision-repro.sh`. Run the static test before trusting a conflict-free file.
 - The fork's own process: this `AGENTS.md`, `.github/pull_request_template.md`, and the fork notes in `README.md`, `CHANGES.md`, and `UPSTREAM.md`.
 
 ## Versions
@@ -40,7 +42,7 @@ To pick the next version, first run `git fetch origin main --tags` and `git fetc
 
 ## Merge gate
 
-ericlitman's release process does not run here. The `verify-open-pstack` skill reports to ericlitman's repository, and Mergify, Unfret, and `live-gate` are not installed. Keep the `verify-open-pstack` directory, because the CI static test runs its coverage test. A pull request merges after all three:
+ericlitman's release process does not run here. `REVIEW.md` and `scripts/release.py publish` describe that process; the fork never runs `publish`, which targets ericlitman/open-pstack and requires `live-gate`. The `verify-open-pstack` skill reports to ericlitman's repository, and Mergify, Unfret, and `live-gate` are not installed. Keep the `verify-open-pstack` directory, because the CI static test runs its coverage test. A pull request merges after all three:
 
 1. The CI `verify` job passes on the head.
 2. A reviewer on a different model from the writer approves the diff.

@@ -43,7 +43,7 @@ describe('registry and ownership', () => {
     expect(matches('skills/xyz/file', 'skills/x/**')).toBe(false);
   });
   test('repository-root attribution files are not runtime', () => {
-    for (const filename of ['NOTICE.md', 'README-UPSTREAM.md', 'LICENSE-cursor-team-kit', 'LICENSE-superpowers']) {
+    for (const filename of ['NOTICE.md', 'README-UPSTREAM.md', 'REVIEW.md', 'LICENSE-cursor-team-kit', 'LICENSE-superpowers']) {
       expect(classify([{ filename }], registry).noRuntime).toBe(true);
     }
   });
@@ -107,6 +107,16 @@ describe('registry and ownership', () => {
     expect(s.noRuntime).toBe(false);
     expect(s.features).toEqual(['shipped-tools']);
     expect(s.features).not.toContain('runner');
+  });
+  test('the transcript resolver belongs to Reflect rather than unrelated shipped tools', () => {
+    const path = 'plugins/pstack/skills/poteto-mode/scripts/resolve-codex-transcript.ts';
+    for (const file of [{ filename: path }, { filename: path.replace('.ts', '') }, { filename: 'docs/removed-resolver.md', previous_filename: path }]) {
+      const s = classify([file], registry);
+      expect(s.skills).toEqual(['reflect']);
+      expect(s.features).toEqual(['skill-invocation:reflect']);
+    }
+    expect(() => classify([{ filename: path.replace('.ts', '.py') }], registry)).toThrow('Unmapped path');
+    expect(classify([{ filename: path.replace('.ts', '.test.ts') }], registry).noRuntime).toBe(true);
   });
   test('rename and deletion preserve old runtime ownership', () => {
     const s = classify([{ filename: 'docs/old.md', previous_filename: 'plugins/pstack/skills/architect/SKILL.md' }], registry);

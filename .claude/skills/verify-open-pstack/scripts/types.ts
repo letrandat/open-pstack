@@ -46,10 +46,11 @@ export interface SessionRecord {
   skills: string[];
   /** Shell commands the harness completed successfully. */
   commands: string[];
-  /** Claude only: every tool call, with `parent` set to the Agent call's id for a subagent's own calls. */
+  /** Claude: every tool call, with `parent` set to the Agent call's id for a subagent's own calls. Codex: every completed shell command, with its captured output. */
   tools: { name: string; id: string; input: Record<string, any>; parent: string | null; result?: string; failed: boolean }[];
 }
 export interface Driver {
+  preflight(receipt: Receipt): Promise<void>;
   prepare(receipt: Receipt): Promise<Installation[]>;
   exercise(receipt: Receipt): Promise<Observation[]>;
   cleanup?(receipt: Receipt): Promise<void>;
