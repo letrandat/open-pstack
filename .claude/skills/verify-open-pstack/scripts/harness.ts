@@ -51,7 +51,9 @@ export function parseSession(harness: Harness, text: string, exitCode: number, s
     .flatMap(e => e.type === 'response_item' && Array.isArray(e.payload?.content) ? (e.payload.content as Event[]).map(c => String(c.text ?? '')) : []);
   const skills = texts.flatMap(text => [...text.matchAll(/<skill>\n<name>([^<]+)<\/name>\n<path>([^<]+)<\/path>/g)])
     .map(([, name, path]) => path!.includes('/plugins/cache/open-pstack/pstack/') ? name! : path!);
-  return { harness, exitCode, started, skills, commands, tools: [] };
+  const tools = items.filter(i => i.type === 'command_execution' && typeof i.command === 'string').map(i => ({ name: 'command', id: String(i.id),
+    input: { command: i.command as string }, result: typeof i.aggregated_output === 'string' ? i.aggregated_output : undefined, parent: null, failed: i.exit_code !== 0 }));
+  return { harness, exitCode, started, skills, commands, tools };
 }
 export async function codexInstallation(output: string, home: string, expected: string): Promise<string> {
   const result = JSON.parse(output);
@@ -82,9 +84,11 @@ export class MacDriver implements Driver {
   private candidate(home: string): Command {
     return (args, options = {}) => this.run(args, { ...options, env: isolatedEnv(home) });
   }
+  async preflight(receipt: Receipt): Promise<void> {
+    await doctor(receipt.artifactRoot, this.run, process.platform, false, requiredHarnesses(receipt));
+  }
   async prepare(receipt: Receipt): Promise<Installation[]> {
     const root = receipt.artifactRoot;
-    await doctor(root, this.run);
     // Fetch a separate immutable reference for pinned-source comparisons.
     const referenceHome = join(root, 'source-home'), reference = join(referenceHome, 'workspace');
     await mkdir(join(referenceHome, 'tmp'), { recursive: true, mode: 0o700 });

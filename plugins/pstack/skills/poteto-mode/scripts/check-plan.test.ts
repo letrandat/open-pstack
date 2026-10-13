@@ -10,6 +10,7 @@ const directories: string[] = [];
 
 const FORBIDDEN_FENCE = [
   "/goal",
+  "/loop",
   "control-ui",
   "control-cli",
   "git show origin/main:",
@@ -137,7 +138,7 @@ describe("check-plan", () => {
     for (const item of FORBIDDEN_FENCE) {
       expect(skeleton.includes(item), item).toBe(false);
     }
-    expect(skeleton).toContain("/loop 1h");
+    expect(skeleton).toContain("hourly");
     expect(skeleton).toContain(CONTRACT.laneSentence);
   });
 
@@ -611,5 +612,48 @@ describe("check-plan", () => {
     expect(result.status).toBe(0);
     expect(result.stdout).toContain("1 PR sections, 0 problems");
     expect(result.stderr).toBe("");
+  });
+});
+
+describe("check-plan fences", () => {
+  const STRAY_HEADING = "Example only], expected";
+
+  function withExample(example: string): string[] {
+    return problemsOf(`${skeleton}${example}`);
+  }
+
+  it("accepts ordinary, indented, and longer closing fences", () => {
+    for (const indent of ["", " ", "  ", "   "]) {
+      expect(withExample(`${indent}\`\`\`markdown\n## Example only\n${indent}\`\`\`\n`)).toEqual([]);
+    }
+    expect(withExample("```markdown\n## Example only\n````\n")).toEqual([]);
+  });
+
+  it("accepts nested backticks and tilde info strings", () => {
+    expect(withExample("````markdown\n```markdown\n## Example only\n```\n````\n")).toEqual([]);
+    expect(withExample("~~~markdown `info`\n## Example only\n ~~~\n")).toEqual([]);
+  });
+
+  it("keeps mismatched, shorter, and suffixed closers inside the fence", () => {
+    expect(withExample("````markdown\n~~~\n## Example only\n````\n")).toEqual([]);
+    expect(withExample("````markdown\n```\n## Example only\n````\n")).toEqual([]);
+    expect(withExample("````markdown\n``` info\n## Example only\n````\n")).toEqual([]);
+  });
+
+  it("rejects headings and prose outside a proper close", () => {
+    for (const suffix of ["  ", "\t"]) {
+      const problems = withExample(`\`\`\`markdown\n## Example only\n\`\`\`${suffix}\n## Example only\n`);
+      expect(problems.some((problem) => problem.includes(STRAY_HEADING))).toBe(true);
+    }
+    const prose = withExample(
+      "```markdown\nThis prose has a mid-sentence colon: inside code\n```\nThis prose has a mid-sentence colon: bad.\n",
+    );
+    expect(prose).toHaveLength(1);
+    expect(prose[0]).toContain("mid-sentence colon");
+  });
+
+  it("rejects backtick info strings containing a backtick", () => {
+    const problems = withExample("```markdown `invalid`\n## Example only\n```\n");
+    expect(problems.some((problem) => problem.includes(STRAY_HEADING))).toBe(true);
   });
 });

@@ -1,9 +1,9 @@
 {
   "skills": [
-    "architect", "arena", "automate-me", "babysit", "benchmark-checklist", "blast-radius", "bro",
-    "correct", "create-verification-skill", "deslop", "figure-it-out", "fix-ci", "fix-merge-conflicts",
-    "get-pr-comments", "how", "interrogate", "maintain-verification-skill",
-    "make-pr-easy-to-review", "no-comments", "poteto-mode",
+    "architect", "arena", "automate-me", "babysit", "benchmark-checklist", "blast-radius", "bro", "correct",
+    "create-verification-skill", "deslop", "figure-it-out", "fix-ci", "fix-merge-conflicts",
+    "get-pr-comments", "how", "interrogate", "ketchup", "maintain-verification-skill",
+    "make-pr-easy-to-review", "no-comments", "poteto-help", "poteto-mode",
     "principle-attack-the-premise", "principle-boundary-discipline", "principle-build-the-lever",
     "principle-encode-lessons-in-structure", "principle-exhaust-the-design-space",
     "principle-experience-first", "principle-explain-the-number", "principle-fix-root-causes", "principle-foundational-thinking",
@@ -45,10 +45,11 @@
     "AGENTS.md", "CLAUDE.md", "tests/skill-collision-repro.sh"
   ],
   "nonRuntime": [
-    "README.md", "CHANGES.md", "LICENSE", "LICENSE.md", "UPSTREAM.md",
+    "README.md", "REVIEW.md", "CHANGES.md", "LICENSE", "LICENSE.md", "UPSTREAM.md",
     "NOTICE.md", "README-UPSTREAM.md", "LICENSE-cursor-team-kit", "LICENSE-superpowers",
     ".gitignore", ".mergify.yml", "docs/**", "assets/**",
     "plugins/pstack/skills/poteto-mode/scripts/bootstrap.test.ts",
-    "plugins/pstack/skills/poteto-mode/scripts/check-plan.test.ts"
+    "plugins/pstack/skills/poteto-mode/scripts/check-plan.test.ts",
+    "plugins/pstack/skills/poteto-mode/scripts/resolve-codex-transcript.test.ts", "scripts/release.py", "scripts/release_test.py"
   ]
 }

@@ -48,12 +48,13 @@ fi
 # Active configuration must use Claude's rolling family aliases. Concrete
 # provider reports may still appear in runner fixtures, but no shipped
 # descriptor, native-agent model field, or live test invocation may pin one.
+# The registry's released pairs record old pins so they keep resolving to their family.
 legacy_model_pins="$(
   grep -REn \
     --include='*.md' --include='*.ts' --include='*.sh' \
     'claude:claude-(fable|opus)-[0-9]|^model: claude-(fable|opus)-[0-9]|--model claude-(fable|opus)-[0-9]' \
     "$repo/plugins/pstack" "$repo/tests" "$repo/README.md" "$repo/docs/reference.md" \
-    2>/dev/null || true
+    2>/dev/null | grep -Ev '^[^:]*/skills/poteto-mode/scripts/runner/registry/models\.ts:[0-9]+:  \{ pair: "claude:claude-(fable|opus)-[0-9]+", family: "(fable|opus)" \},$' || true
 )"
 standalone_code_pins="$(
   grep -REn \
@@ -341,7 +342,7 @@ grep -Fq 'never infer stack order from their equal base branches' "$autopilot_st
 grep -Fq 'git rebase --onto "$parent_tip" "$current_base_sha" -- "$branch"' "$autopilot_stack" || shipping_safety_bad="${shipping_safety_bad}Autopilot-stack does not move only child commits when a parent tip changes"$'\n'
 grep -Fq "Shipping step 4's disarm-and-confirm rule to that child and every descendant" "$opening_a_pr" || shipping_safety_bad="${shipping_safety_bad}Opening a PR can rewrite or retarget an armed existing stack"$'\n'
 grep -Fq 'If repository instructions require a draft until named evidence exists' "$opening_a_pr" || shipping_safety_bad="${shipping_safety_bad}Opening a PR ignores repository-required draft evidence gates"$'\n'
-grep -Fq 'use the resolved Origin command for every fork PR' "$opening_a_pr" || shipping_safety_bad="${shipping_safety_bad}Opening a PR does not bind a root fork PR to its explicit head repository"$'\n'
+grep -Fq 'Create every fork PR' "$opening_a_pr" || shipping_safety_bad="${shipping_safety_bad}Opening a PR does not bind a root fork PR to its explicit head repository"$'\n'
 grep -Fq 'A fork child PR targets trunk while retaining local parent ancestry' "$multi_phase_plan" || shipping_safety_bad="${shipping_safety_bad}Multi-phase plan does not model fork stack PR bases"$'\n'
 for fork_file in "$autopilot_stack" "$opening_a_pr" "$multi_phase_plan"; do
   grep -Fq 'gh api --method POST "repos/$base_repo/pulls"' "$fork_file" || shipping_safety_bad="${shipping_safety_bad}${fork_file} does not create fork PRs through the organization-capable GitHub API"$'\n'
@@ -481,6 +482,14 @@ if [ -n "$verification_bad" ]; then
   fail=1
 else
   note "ok: shared project verification skill has executable helper and maintained feature map"
+fi
+
+if release_out="$(python3 "$repo/scripts/release_test.py" 2>&1 && python3 "$repo/scripts/release.py" notes 2>&1 >/dev/null)"; then
+  note "ok: release notes build from the CHANGES.md section for the manifest version ($vc)"
+else
+  note "FAIL: release notes do not build"
+  note "$release_out"
+  fail=1
 fi
 
 note "Checking non-shipped verification helper"

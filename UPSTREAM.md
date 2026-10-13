@@ -8,12 +8,12 @@ open-pstack tracks [Cursor's pstack](https://github.com/cursor/plugins/tree/main
 | --- | --- |
 | Repository | `https://github.com/cursor/plugins.git` |
 | Path | `pstack/` |
-| Commit | `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` |
-| Upstream version | `0.15.9` |
-| open-pstack version | `1.5.1-ld.1` |
-| Port base | `1b03678171f6f400ae2cc9dc4e7a4a6a13e4bb43` |
+| Commit | `997ffc7fe26bdaa6478a14e7f5b8d5f9ed747102` |
+| Upstream version | `0.15.21` |
+| open-pstack version | `1.7.1-ld.1` |
+| Port base | `4f2b9b09dc9ba4f8fe08812f70bf11ec0388b201` |
 
-The table above is the current Cursor sync point. This fork's Open Pstack 1.5.1-ld.1 imports Cursor pstack 0.15.9. `Port base` records the ericlitman/open-pstack commit this fork last landed. Cursor content and the port base advance independently. `README-UPSTREAM.md` preserves the upstream pstack README verbatim. `CHANGES.md` and `NOTICE.md` describe the adaptations and provenance.
+The table above is the current Cursor sync point. This fork's Open Pstack 1.7.1-ld.1 imports Cursor pstack 0.15.21. `Port base` records the ericlitman/open-pstack commit this fork last landed. Cursor content and the port base advance independently. `README-UPSTREAM.md` preserves the upstream pstack README verbatim. `CHANGES.md` and `NOTICE.md` describe the adaptations and provenance.
 
 ## Upstream-only exclusions
 
@@ -25,11 +25,20 @@ The table above is the current Cursor sync point. This fork's Open Pstack 1.5.1-
 - The expected-runtime column in `70b2dc8`'s `children.tsv` and its expected-runtime stuck test are not applied. A lane is stuck only on affirmative failure evidence.
 - The explicit Grok, Opus, and Sol defaults for the Why and Reflect roles are not applied. Those roles stay on `inherit-parent` because the external runner omits the parent's MCP servers.
 - The Claude manifest does not take the logo field from `efa2a53` because Claude Code has no schema for it. The shared asset is exposed through the Codex manifest instead.
-- Two `disable-model-invocation: true` lines from `23e4138` are not applied to `benchmark-checklist` or `principle-explain-the-number`. Poteto-mode, Perf issue, and Hillclimb invoke the checklist by name, and the flag blocks that route on Claude Code. The principle uses `user-invocable: false`, like the other model-readable leaves. `correct` keeps its user-only flag from `9511e60`.
-- This sync does not import `pstack/.cursor-plugin/plugin.json`. The port has separate Claude Code and Codex manifests with its own version. It also leaves `pstack/docs/guide/08-principles.md` and `pstack/docs/guide/README.md` upstream because the guide teaches Cursor UI, sticky mode, and cloud agents. The shared principle index and port reference carry the new leaf instead.
+- Commit `df58112` (pstack 0.15.15) is not applied. It drops Sol from every default, cuts the panels to Opus and Grok, and moves Opus from `max` to `xhigh`. Open Pstack keeps its own model defaults and three-model panels.
+- The `disable-model-invocation: true` lines that `23e4138` puts on `benchmark-checklist` and `principle-explain-the-number` are not applied. The same flag, which upstream carried on principle leaves and `figure-it-out` before 0.15.5, stays off as in earlier syncs. Principle leaves keep `user-invocable: false`, and `figure-it-out` and `benchmark-checklist` stay model-invocable because poteto-mode routes to them by name. The typed-only `correct`, `ketchup`, and `poteto-help` keep the flag.
+- The Built-in PR tool paragraph from `23e4138` and `00b14f1` is not applied. It describes a Cursor run tool that Claude Code and Codex do not have.
+- `00b14f1`'s shorter `principle-test-behavior-not-implementation` text is not applied. It fails every restated constant, table row, or prompt string and every absence-only assertion (`not.toHaveBeenCalled`, `toBeUndefined`, `toEqual([])`), and the 0.15.0 local correction keeps both kinds when they test a real contract. The poteto-mode index line for this principle takes `00b14f1`'s format change and keeps the 0.15.0 wording.
+- The 40-line squash-body cutoff returns in `00b14f1` and stays omitted, as in the 0.15.0 sync.
+- Autopilot-full step 5's rule from `23e4138` is not applied. That rule lets a green head with an unchanged patch ID merge without another rebase after trunk moves, when `git merge-tree` is clean and trunk touched none of the PR's paths or CI paths. Both checks pass when trunk removes an export that the PR's new code imports, so the combined tree merges without a build or test. Step 5 keeps sending a trunk move before the merge through the patch ID rule in `playbooks/shipping.md`.
+- `correct` step 3 from `9511e60` says to fix or delete any test that would still pass if every function it calls returned nothing. The port sends that step to `principle-test-behavior-not-implementation`, which keeps negative-path tests whose correct result is an absence.
+- `poteto-agent.md` does not take `is_background: true` from `2bd5dd4`. Claude Code documents `background`, not `is_background`, in agent frontmatter, and Codex defines agents in TOML and maps concurrency at dispatch. The port keeps `general-purpose` in the description and the `skills: [pstack:poteto-mode]` preload. `364a77e`'s sentence that `poteto-agent` uses the path its parent gave it applies only when the preload did not already supply poteto-mode, so the preloaded Claude agent does not reread the file.
+- The root Agent Plugins v1 `pstack/plugin.json` from `e5a02f8`, its `1b6d44f` version bump, and the `997ffc7` bump of it and `pstack/.cursor-plugin/plugin.json` are not applied. The port keeps its current Claude manifest at `plugins/pstack/.claude-plugin/plugin.json` and Codex manifest at `plugins/pstack/.codex-plugin/plugin.json`. Agent Plugins v1 is revisited with #13.
+- `unslop` takes `bc697d0`'s description without its `disable-model-invocation: true` line, as for `73f8be4` above.
 
 ## Local port-patch ledger
 
+- **#140 — Reflect transcript resolution**: Cursor's Reflect step 1 reads the `agent-transcripts/` directory its system prompt names; the port had substituted Claude Code's per-project directory, which left Codex without a lookup. The port replaces that step's body with one line that points to `plugins/pstack/skills/poteto-mode/references/codex-tools.md#active-transcripts`, and leaves the rest of `reflect/SKILL.md` unchanged. That mapping section holds the harness specifics: the Claude per-project scope, layouts, candidate and scan limits, opening-message verification, the Codex resolver call, and the 2,000-word digest fallback. The port-authored Bun resolver `plugins/pstack/skills/poteto-mode/scripts/resolve-codex-transcript.ts`, started through the `sh` launcher `resolve-codex-transcript` next to it so project Bun config and `.env` files cannot affect it, looks up the parent's known chat ID in Codex's read-only `threads` index, checks rollout scope and ownership, and prints opening-message metadata without transcript text. Preserve this divergence during upstream syncs: keep step 1 as the one-line pointer and keep the mapping section and resolver.
 - **#120 — harness config homes** (tracked for #105): Cursor's setup destination is `~/.cursor/rules/`. The shared port resolves nonempty `CLAUDE_CONFIG_DIR` / `CODEX_HOME`, otherwise `$HOME/.claude` / `$HOME/.codex`, once at `plugins/pstack/skills/poteto-mode/references/codex-tools.md#harness-config-homes`. `setup-pstack/SKILL.md` reuses that home for reads, sheet/integration writes, snapshots, restoration, and readback; Claude preserves the literal legacy import at the default home and renders exactly `@./pstack-models.md` for redirected homes, keeping spaces and `#` in the config-directory name out of the import line; reruns replace the one import whose target basename is `pstack-models.md`, append if absent, and stop if duplicated. Preserve this intentional divergence during upstream syncs. The named config-home invariant in `tests/skill-collision-repro.sh` rejects literal default destinations outside the legacy import, requires the literal default-home rendering and zero/one/many import rules, and verifies unset/empty/space-containing resolution without daily writes. See `CHANGES.md` for the port correction and `tests/setup-config-home-repro.sh` for redirected live-evidence preparation. The Cursor sync point is unchanged.
 
 ## Check for changes
@@ -44,19 +53,19 @@ Fetch and inspect only commits that touched pstack after the recorded sync point
 
 ```shell
 git fetch cursor main
-git log --oneline e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a..cursor/main -- pstack
-git diff --stat e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a..cursor/main -- pstack
+git log --oneline 997ffc7fe26bdaa6478a14e7f5b8d5f9ed747102..cursor/main -- pstack
+git diff --stat 997ffc7fe26bdaa6478a14e7f5b8d5f9ed747102..cursor/main -- pstack
 ```
 
 No output means the tracked pstack tree has not changed. This comparison does not need a polling service or generated mirror branch.
 
 ## Incorporate a change
 
-1. In the letrandat fork, track the sync in a `letrandat/open-pstack` issue and branch as the `AGENTS.md` Sync section says. (In ericlitman/open-pstack, the step is an issue there and a branch from current `main`.)
+1. In the letrandat fork, branch as the `AGENTS.md` Sync section says and track the sync in the pull request. (In ericlitman/open-pstack, the step is a GitHub issue there and a branch from current `main`.)
 2. Read each upstream pstack commit in order. Bring over its intent and content, then apply only the Claude Code and Codex substitutions documented in `CHANGES.md`.
 3. Keep one shared `plugins/pstack/skills/` tree. Put harness translation in the existing `codex-tools.md` and provider routing in `provider-dispatch.md`; do not fork a skill per harness.
 4. Update the commit and version in this file, the affected provenance rows in `NOTICE.md`, and `README-UPSTREAM.md` when upstream changes it.
 5. Run CI-equivalent checks locally, then run the installed Claude Code and Codex behavioral lanes required by the changed surface. Unit tests alone are not a release gate. In the letrandat fork, the `AGENTS.md` merge gate and smoke test replace these lanes.
-6. Merge the reviewed PR before tagging the next open-pstack release.
+6. Merge the reviewed PR before tagging the next open-pstack release. Publish the release with `python3 scripts/release.py publish` from a clean checkout of `main`. In the letrandat fork, `release.py publish` targets ericlitman/open-pstack and requires `live-gate`, so tag by hand as the `AGENTS.md` Release section says.
 
 Cursor's version and open-pstack's version are independent. Cursor's version identifies the imported content; open-pstack's version identifies the cross-harness distribution.

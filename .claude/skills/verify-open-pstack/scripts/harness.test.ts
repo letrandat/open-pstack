@@ -3,7 +3,7 @@ import { cp, lstat, mkdtemp, mkdir, readFile, readlink, realpath, rm, stat, syml
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { doctor } from './doctor.ts';
-import { codexInstallation, launch, MacDriver, verifyCodexEnabled } from './harness.ts';
+import { codexInstallation, launch, MacDriver, parseSession, verifyCodexEnabled } from './harness.ts';
 import { verifyProjectDoctor } from '../features/recipes.ts';
 import { newReceipt } from './core.ts';
 import { sourceDigest } from './provenance.ts';
@@ -98,7 +98,7 @@ describe('isolated harness boundaries', () => {
     await symlink(skill, join(workspace, '.claude/skills/verify-open-pstack'));
     const alias = join(root, 'workspace-alias'); await symlink(workspace, alias);
     const run: Command = async args => args.includes('--version') ? 'version' : '--plugin-dir --settings --setting-sources --json local path';
-    await doctor(root, run, 'darwin', false);
+    await doctor(root, run, 'darwin', false, []);
     const parentText = await readFile(join(root, 'doctor.json'), 'utf8');
     await expect(verifyProjectDoctor([parentText], workspace)).rejects.toThrow('passing child doctor');
     await doctor(root, run, 'darwin', true);
@@ -222,7 +222,6 @@ describe('isolated harness boundaries', () => {
       await expect(stat(join(home, '.claude'))).rejects.toThrow('ENOENT');
       if (!failInstall) expect(await readFile(join(root, 'sessions', harness, 'project-skill/doctor.jsonl'), 'utf8')).toBe('retained raw native evidence');
     }
-    expect(JSON.parse(await readFile(join(root, 'doctor.json'), 'utf8')).result).toBe('pass');
   });
   test.each([['claude', false], ['claude', true], ['codex', false], ['codex', true]] as const)('%s setup interruption restores exact bytes or forbids publication (restore failure=%s)', async (harness, failRestore) => {
     const root = await fixture(), home = join(root, 'state', harness), workspace = join(home, 'workspace');
@@ -327,6 +326,20 @@ function stub(stream: string, effect?: (cwd: string) => Promise<void>, exitCode 
 const writeResult = async (cwd: string) => { await writeFile(join(cwd, 'result.md'), 'the skill result'); };
 
 describe('headless recipes', () => {
+  test('Codex completed commands keep their captured output and failure state', () => {
+    const stream = [
+      { type: 'item.started', item: { id: 'item_0', type: 'command_execution', command: 'pending', aggregated_output: '', exit_code: null } },
+      { type: 'item.completed', item: { id: 'item_1', type: 'command_execution', command: 'true', aggregated_output: 'out\n', exit_code: 0 } },
+      { type: 'item.completed', item: { id: 'item_2', type: 'command_execution', command: 'false', aggregated_output: '', exit_code: 1 } },
+      { type: 'item.completed', item: { id: 'item_3', type: 'agent_message', text: 'I ran it.' } },
+    ].map(event => JSON.stringify(event)).join('\n');
+    const record = parseSession('codex', stream, 0, 0);
+    expect(record.commands).toEqual(['true']);
+    expect(record.tools).toEqual([
+      { name: 'command', id: 'item_1', input: { command: 'true' }, result: 'out\n', parent: null, failed: false },
+      { name: 'command', id: 'item_2', input: { command: 'false' }, result: '', parent: null, failed: true },
+    ]);
+  });
   test('missing or unsupported recipes fail before any session starts', async () => {
     const { root, installation } = await candidate('codex');
     for (const [feature, reason] of [['mystery', 'missing-recipe:codex/mystery'], ['assets:codex', 'unsupported-native-consumer']]) {
@@ -407,7 +420,7 @@ describe('headless recipes', () => {
         async comment(_pr, body) { comments.push(body); return `https://github.com/${REPO}/pull/111#issuecomment-1`; },
         async status(_sha, state) { statuses.push(state); },
       },
-      driver: { prepare: async () => [installation], exercise: receipt => mac.exercise(receipt), cleanup: () => mac.cleanup() },
+      driver: { preflight: async () => {}, prepare: async () => [installation], exercise: receipt => mac.exercise(receipt), cleanup: () => mac.cleanup() },
     })).rejects.toThrow('fixture-file-missing:result.md');
     expect(statuses).toEqual(['failure']);
     expect(comments.join('\n')).not.toContain('Observation');
