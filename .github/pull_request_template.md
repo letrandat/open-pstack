@@ -1,5 +1,3 @@
-Closes #
-
 ## Why
 
 

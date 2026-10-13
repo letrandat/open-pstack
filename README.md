@@ -82,7 +82,7 @@ In Codex, ask:
 Use pstack:setup-pstack to configure pstack.
 ```
 
-Setup checks the models you can actually run, shows how each one will start, and asks before saving the choices. The default review panel uses Opus, GPT-5.6 Sol, and Grok 4.7, and setup probes only the models your roles use. Fable remains available.
+Setup checks the models you can actually run, shows how each one will start, and asks before saving the choices. The default review panel uses Opus, GPT-6.1 Sol, and Grok 4.7, and setup probes only the models your roles use. Fable remains available.
 
 An older model sheet starts using the rolling aliases in memory as soon as this release is installed. Run setup once after updating to persist that migration. It replaces versioned Fable and Opus entries while preserving every role assignment and effort selection.
 

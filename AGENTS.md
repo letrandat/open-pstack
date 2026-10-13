@@ -1,6 +1,6 @@
 # open-pstack (letrandat fork)
 
-This repository is letrandat's fork of `ericlitman/open-pstack`. It lands Cursor pstack syncs ahead of ericlitman and otherwise follows ericlitman `main`. Track fork work in this repository's GitHub Issues. Port defects that also exist upstream belong in `ericlitman/open-pstack` Issues.
+This repository is letrandat's fork of `ericlitman/open-pstack`. It lands Cursor pstack syncs ahead of ericlitman and otherwise follows ericlitman `main`. Issues are disabled on the fork, so track fork work in its pull requests. Port defects that also exist upstream belong in `ericlitman/open-pstack` Issues.
 
 Read `UPSTREAM.md` before changing upstream-derived content.
 
@@ -31,6 +31,7 @@ These parts of the patch are easy to lose in a rebuild:
 - Test and catalog updates that follow the skill text, such as `tests/skill-collision-repro.sh` and `docs/reference.md`.
 - Release metadata: the version in the four places `tests/skill-collision-repro.sh` checks, and the `Port base` row in `UPSTREAM.md`.
 - A `CHANGES.md` section headed with the new version. The static test runs `scripts/release.py notes`, which needs exactly one nonempty section for the manifest version.
+- Fork links in `poteto-help/SKILL.md`: install steps and public-copy links name `letrandat/open-pstack`, not ericlitman's repository.
 - A static assertion that a clean merge keeps but the newer text no longer satisfies, such as an old phrase in `tests/skill-collision-repro.sh`. Run the static test before trusting a conflict-free file.
 - The fork's own process: this `AGENTS.md`, `.github/pull_request_template.md`, and the fork notes in `README.md`, `CHANGES.md`, and `UPSTREAM.md`.
 
@@ -42,7 +43,7 @@ To pick the next version, first run `git fetch origin main --tags` and `git fetc
 
 ## Merge gate
 
-ericlitman's release process does not run here. `REVIEW.md` and `scripts/release.py publish` describe that process; the fork never runs `publish`, which targets ericlitman/open-pstack and requires `live-gate`. The `verify-open-pstack` skill reports to ericlitman's repository, and Mergify, Unfret, and `live-gate` are not installed. Keep the `verify-open-pstack` directory, because the CI static test runs its coverage test. A pull request merges after all three:
+ericlitman's release process does not run here. `REVIEW.md` is ericlitman's review-panel mandate and does not bind fork reviews; the merge gate below does. `scripts/release.py publish` is ericlitman's release step, which targets ericlitman/open-pstack and requires `live-gate`, so the fork never runs it. The `verify-open-pstack` skill reports to ericlitman's repository, and Mergify, Unfret, and `live-gate` are not installed. Keep the `verify-open-pstack` directory, because the CI static test runs its coverage test. A pull request merges after all three:
 
 1. The CI `verify` job passes on the head.
 2. A reviewer on a different model from the writer approves the diff.
@@ -104,7 +105,7 @@ Read each upstream commit's intent, then resolve each conflict hunk with this ta
 
 | Part of a hunk | Decision |
 | --- | --- |
-| A harness translation listed in `CHANGES.md`: AskUserQuestion, `run`/`verify`, provider dispatch, fork-aware `gh api`, the Claude `/goal` substitute | Keep the port's wording |
+| A harness translation listed in `CHANGES.md`: AskUserQuestion, `run`/`verify`, provider dispatch, fork-aware `gh api` | Keep the port's wording |
 | An exclusion or adaptation recorded in `UPSTREAM.md` or `CHANGES.md`: stuck only on affirmative failure evidence, draft until evidence, no `is_background`, no Cursor cloud agents, the autopilot lease and expected-head merge steps | Keep the port's text |
 | A new upstream policy | Take upstream's policy, written in the port's Claude Code and Codex terms |
 | A hunk no row decides | Stop and ask the operator |

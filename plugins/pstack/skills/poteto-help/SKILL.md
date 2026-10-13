@@ -10,7 +10,7 @@ Answer the user's question about pstack, hand them a prompt they can send, and l
 
 A message that asks for work, such as "use pstack to fix this bug", is not a help question. Read [`poteto-mode`](../poteto-mode/SKILL.md), do the work under it, and mention once that starting each task with `/poteto-mode` keeps it on.
 
-This file maps questions to the skills and guide pages that hold the answers. Those files own the details. Read the file you route to before you quote it, and trust it when it disagrees with this map. The skill links here point into the installed plugin, which the user may not be able to open, so give the user the file's public copy: `https://github.com/ericlitman/open-pstack/blob/main/plugins/pstack/` followed by its path. The guide pages are Lauren's upstream guide. They show Cursor's interface, so translate any Cursor step with this file before you pass it on.
+This file maps questions to the skills and guide pages that hold the answers. Those files own the details. Read the file you route to before you quote it, and trust it when it disagrees with this map. The skill links here point into the installed plugin, which the user may not be able to open, so give the user the file's public copy: `https://github.com/letrandat/open-pstack/blob/main/plugins/pstack/` followed by its path. The guide pages are Lauren's upstream guide. They show Cursor's interface, so translate any Cursor step with this file before you pass it on.
 
 ## Find out what they need
 
@@ -34,11 +34,11 @@ When the model rule is missing and it matters, ask whether the user wants to pic
 
 ## Get set up
 
-1. Install. In Claude Code, run `/plugin marketplace add ericlitman/open-pstack`, then `/plugin install pstack@open-pstack`, then `/reload-plugins`. In Codex, run `codex plugin marketplace add ericlitman/open-pstack --ref main`, then `codex plugin add pstack@open-pstack`, and turn on `multi_agent` per [`codex-tools.md`](../poteto-mode/references/codex-tools.md).
+1. Install. In Claude Code, run `/plugin marketplace add letrandat/open-pstack`, then `/plugin install pstack@open-pstack`, then `/reload-plugins`. In Codex, run `codex plugin marketplace add letrandat/open-pstack --ref main`, then `codex plugin add pstack@open-pstack`, and turn on `multi_agent` per [`codex-tools.md`](../poteto-mode/references/codex-tools.md).
 2. Run [`/setup-pstack`](../setup-pstack/SKILL.md). It maps a model to each role, asks one requested effort for each model family it assigns, probes those models, and writes a model sheet. The sheet applies to new sessions.
 3. Start a real task with `/poteto-mode`, a goal, and a check that can pass or fail.
 
-In Claude Code, a typed skill carries the plugin prefix, as in `/pstack:poteto-mode`. In Codex, ask for a skill by name, as in "use pstack:poteto-mode". The [README](https://github.com/ericlitman/open-pstack#readme) and [guide page 1](https://github.com/cursor/plugins/blob/main/pstack/docs/guide/01-setup.md) have the details. Offer to word their first prompt with them, per [`references/prompting.md`](references/prompting.md).
+In Claude Code, a typed skill carries the plugin prefix, as in `/pstack:poteto-mode`. In Codex, ask for a skill by name, as in "use pstack:poteto-mode". The [README](https://github.com/letrandat/open-pstack#readme) and [guide page 1](https://github.com/cursor/plugins/blob/main/pstack/docs/guide/01-setup.md) have the details. Offer to word their first prompt with them, per [`references/prompting.md`](references/prompting.md).
 
 If cost is the worry, say where the tokens go and how to spend fewer. pstack spends extra tokens on subagents and review panels. Rerun `/setup-pstack` and pick lower efforts or cheaper models. A role set to `auto` or `inherit-parent` runs on the session's model, which saves tokens when the session runs on a cheaper model. A shorter panel list runs fewer subagents, one for each entry. Save `/poteto-mode` for work that needs rigor.
 
@@ -54,7 +54,7 @@ Whether `/poteto-mode` stays on depends on the harness:
 - In Codex, ask for `pstack:poteto-mode` by name at the start of each task.
 - In both, start each new task with `/poteto-mode` when it matters.
 
-Mid-session, "new task" makes the mode match a fresh playbook. In Claude Code, `/poteto-mode` already uses `poteto-agent` for the subagents its playbook steps spawn. To get the same style from a subagent of your own, spawn it with `subagent_type: "poteto-agent"`. Codex has no `poteto-agent` type, so dispatch a `spawn_agent` whose instructions say to read the `poteto-mode` skill in full first.
+Mid-session, "new task" makes the mode match a fresh playbook. In Claude Code, `/poteto-mode` already uses `poteto-agent` for the subagents its playbook steps spawn. To get the same style from a subagent of your own, spawn it with `subagent_type: "poteto-agent"`. Codex has no `poteto-agent` type, so dispatch a `spawn_agent` whose instructions give the absolute path of the installed `poteto-mode/SKILL.md` and say to read it in full first.
 
 ## Pick a skill
 
